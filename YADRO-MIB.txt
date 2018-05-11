@@ -11,11 +11,14 @@ IMPORTS
 ;
 
 yadro MODULE-IDENTITY
-    LAST-UPDATED    "201802080000Z"
+    LAST-UPDATED    "201805110000Z"
     ORGANIZATION    "Yadro"
     CONTACT-INFO
         "Primary Contact: SNMP support team
          email:     snmp@yadro.com"
+    DESCRIPTION
+        "Added software items table"
+    REVISION        "201805110000Z"
     DESCRIPTION
         "Added current and power sensor objects"
     REVISION        "201802080000Z"
@@ -37,6 +40,7 @@ yadroSensors            OBJECT IDENTIFIER ::= { yadro 1 }
 yadroConformance        OBJECT IDENTIFIER ::= { yadro 2 }
 yadroCompliances        OBJECT IDENTIFIER ::= { yadroConformance 1 }
 yadroGroups             OBJECT IDENTIFIER ::= { yadroConformance 2 }
+-- yadroSoftwareTable takes { yadro 5 }
 
 --
 
@@ -559,6 +563,73 @@ yadroPowerSensorState OBJECT-TYPE
     ::= { yadroPowerSensorsEntry 7 }
 
 --
+yadroSoftwareTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF YADROSoftwareEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table of existing firmware images."
+    ::= { yadro 5 }
+
+yadroSoftwareEntry OBJECT-TYPE
+    SYNTAX      YADROSoftwareEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing a firmware images details."
+    INDEX       { yadroSoftwareHash }
+    ::= { yadroSoftwareTable 1 }
+
+YADROSoftwareEntry ::= SEQUENCE {
+    yadroSoftwareHash       OCTET STRING,
+    yadroSoftwareVersion    OCTET STRING,
+    yadroSoftwarePurpose    Integer32,
+    yadroSoftwareActivation Integer32,
+    yadroSoftwarePriority   Integer32
+}
+
+yadroSoftwareHash OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(1..8))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The software hash represent as string."
+    ::= { yadroSoftwareEntry 1 }
+
+yadroSoftwareVersion OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The software version."
+    ::= { yadroSoftwareEntry 2 }
+
+yadroSoftwarePurpose OBJECT-TYPE
+    SYNTAX      INTEGER { unknown(0), other(1), system(2), bmc(3), host(4) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The software version purpose."
+    ::= { yadroSoftwareEntry 3 }
+
+yadroSoftwareActivation OBJECT-TYPE
+    SYNTAX      INTEGER { notReady(0), invalid(1), ready(2),
+                          activating(3), active(4), failed(5) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current activation state of the software."
+    ::= { yadroSoftwareEntry 4 }
+
+yadroSoftwarePriority OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The piority, for redundancy purposes, of the associated software."
+    ::= { yadroSoftwareEntry 5 }
+
+--
 
 yadroHostPowerStateNotification NOTIFICATION-TYPE
     OBJECTS     { yadroHostPowerState }
@@ -615,7 +686,8 @@ yadroCommpliance MODULE-COMPLIANCE
                        yadroVoltSensorsTableGroup,
                        yadroTachSensorsTableGroup,
                        yadroCurrSensorsTableGroup,
-                       yadroPowerSensorsTableGroup
+                       yadroPowerSensorsTableGroup,
+                       yadroSoftwareTableGroup
                      }
     ::= { yadroCompliances 1 }
 
@@ -708,5 +780,17 @@ yadroPowerSensorsTableGroup OBJECT-GROUP
         "A collection of objects providing information
         about power sensors."
     ::= { yadroGroups 6 }
+
+yadroSoftwareTableGroup OBJECT-GROUP
+    OBJECTS     { yadroSoftwareVersion,
+                  yadroSoftwarePurpose,
+                  yadroSoftwareActivation,
+                  yadroSoftwarePriority
+                }
+    STATUS      current
+    DESCRIPTION
+        "A collection for objects providing information
+        about existing software."
+    ::= { yadroGroups 7 }
 
 END
