@@ -4,18 +4,21 @@ IMPORTS
     MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
     Integer32, enterprises
         FROM SNMPv2-SMI
-    TEXTUAL-CONVENTION
+    TEXTUAL-CONVENTION, TruthValue
         FROM SNMPv2-TC
     MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
         FROM SNMPv2-CONF
 ;
 
 yadro MODULE-IDENTITY
-    LAST-UPDATED    "201805110000Z"
+    LAST-UPDATED    "201806190000Z"
     ORGANIZATION    "Yadro"
     CONTACT-INFO
         "Primary Contact: SNMP support team
          email:     snmp@yadro.com"
+    DESCRIPTION
+        "Added inventory table"
+    REVISION        "201806190000Z"
     DESCRIPTION
         "Added software items table"
     REVISION        "201805110000Z"
@@ -40,7 +43,9 @@ yadroSensors            OBJECT IDENTIFIER ::= { yadro 1 }
 yadroConformance        OBJECT IDENTIFIER ::= { yadro 2 }
 yadroCompliances        OBJECT IDENTIFIER ::= { yadroConformance 1 }
 yadroGroups             OBJECT IDENTIFIER ::= { yadroConformance 2 }
+-- yadroInventoryTable takes { yadro 4 }
 -- yadroSoftwareTable takes { yadro 5 }
+
 
 --
 
@@ -631,6 +636,118 @@ yadroSoftwarePriority OBJECT-TYPE
 
 --
 
+yadroInventoryTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF YADROInventoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table of inventory items."
+    ::= { yadro 4 }
+
+yadroInventoryEntry OBJECT-TYPE
+    SYNTAX      YADROInventoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing a inventory item details."
+    INDEX       { yadroInventoryPath }
+    ::= { yadroInventoryTable 1 }
+
+YADROInventoryEntry ::= SEQUENCE {
+    yadroInventoryPath          OCTET STRING,
+    yadroInventoryName          OCTET STRING,
+    yadroInventoryManufacturer  OCTET STRING,
+    yadroInventoryBuildDate     OCTET STRING,
+    yadroInventoryModel         OCTET STRING,
+    yadroInventoryPartNumber    OCTET STRING,
+    yadroInventorySerialNumber  OCTET STRING,
+    yadroInventoryVersion       OCTET STRING,
+    yadroInventoryPresent       TruthValue,
+    yadroInventoryFunctional    TruthValue
+}
+
+yadroInventoryPath OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(1..117))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The DBus path of the inventory item based on inventory folder."
+    ::= { yadroInventoryEntry 1 }
+
+yadroInventoryName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The human readable name of the inventory item."
+    ::= { yadroInventoryEntry 2 }
+
+yadroInventoryManufacturer OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The inventory item manufacturer."
+    ::= { yadroInventoryEntry 3 }
+
+yadroInventoryBuildDate OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The date of inventory item manufacture in YYYYMMDD format."
+    ::= { yadroInventoryEntry 4 }
+
+yadroInventoryModel OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The model of the inventory item."
+    ::= { yadroInventoryEntry 5 }
+
+yadroInventoryPartNumber OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The inventory item part number, typically a stocking number."
+    ::= { yadroInventoryEntry 6 }
+
+yadroInventorySerialNumber OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The inventory item serial number."
+    ::= { yadroInventoryEntry 7 }
+
+yadroInventoryVersion OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The version of the inventory item."
+    ::= { yadroInventoryEntry 8 }
+
+yadroInventoryPresent OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Whether or not the inventory item is present."
+    ::= { yadroInventoryEntry 9 }
+
+yadroInventoryFunctional OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the inventory item is functional or not."
+    ::= { yadroInventoryEntry 10 }
+
+--
+
 yadroHostPowerStateNotification NOTIFICATION-TYPE
     OBJECTS     { yadroHostPowerState }
     STATUS      current
@@ -673,6 +790,15 @@ yadroPwrSensorStateNotification NOTIFICATION-TYPE
         "Notification about changed state of current sensor"
     ::= { yadroNotifications 6 }
 
+yadroInventoryItemNotification NOTIFICATION-TYPE
+    OBJECTS     { yadroInventoryPresent,
+                  yadroInventoryFunctional }
+    STATUS      current
+    DESCRIPTION
+        "Notification about changed presence or functional
+        of the inventory item."
+    ::= { yadroNotifications 7 }
+
 --
 
 yadroCommpliance MODULE-COMPLIANCE
@@ -687,7 +813,8 @@ yadroCommpliance MODULE-COMPLIANCE
                        yadroTachSensorsTableGroup,
                        yadroCurrSensorsTableGroup,
                        yadroPowerSensorsTableGroup,
-                       yadroSoftwareTableGroup
+                       yadroSoftwareTableGroup,
+                       yadroInventoryTableGroup
                      }
     ::= { yadroCompliances 1 }
 
@@ -697,7 +824,8 @@ yadroNotificationsGroup NOTIFICATION-GROUP
                       yadroTempSensorStateNotification,
                       yadroVoltSensorStateNotification,
                       yadroCurrSensorStateNotification,
-                      yadroPwrSensorStateNotification
+                      yadroPwrSensorStateNotification,
+                      yadroInventoryItemNotification
                     }
     STATUS      current
     DESCRIPTION
@@ -792,5 +920,22 @@ yadroSoftwareTableGroup OBJECT-GROUP
         "A collection for objects providing information
         about existing software."
     ::= { yadroGroups 7 }
+
+yadroInventoryTableGroup OBJECT-GROUP
+    OBJECTS     { yadroInventoryName,
+                  yadroInventoryManufacturer,
+                  yadroInventoryBuildDate,
+                  yadroInventoryPartNumber,
+                  yadroInventorySerialNumber,
+                  yadroInventoryVersion,
+                  yadroInventoryModel,
+                  yadroInventoryPresent,
+                  yadroInventoryFunctional
+                }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing information
+         about existing itventory items."
+    ::= { yadroGroups 8 }
 
 END
