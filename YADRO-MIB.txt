@@ -11,11 +11,14 @@ IMPORTS
 ;
 
 yadro MODULE-IDENTITY
-    LAST-UPDATED    "201806190000Z"
+    LAST-UPDATED    "201909260000Z"
     ORGANIZATION    "Yadro"
     CONTACT-INFO
         "Primary Contact: SNMP support team
          email:     snmp@yadro.com"
+    DESCRIPTION
+        "Added node for products manufactored by YADRO LLC"
+    REVISION        "201909260000Z"
     DESCRIPTION
         "Added inventory table"
     REVISION        "201806190000Z"
@@ -43,6 +46,7 @@ yadroSensors            OBJECT IDENTIFIER ::= { yadro 1 }
 yadroConformance        OBJECT IDENTIFIER ::= { yadro 2 }
 yadroCompliances        OBJECT IDENTIFIER ::= { yadroConformance 1 }
 yadroGroups             OBJECT IDENTIFIER ::= { yadroConformance 2 }
+yadroProducts           OBJECT IDENTIFIER ::= { yadro 3 }
 -- yadroInventoryTable takes { yadro 4 }
 -- yadroSoftwareTable takes { yadro 5 }
 
