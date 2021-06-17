@@ -11,11 +11,14 @@ IMPORTS
 ;
 
 yadro MODULE-IDENTITY
-    LAST-UPDATED    "201909260000Z"
+    LAST-UPDATED    "202106170000Z"
     ORGANIZATION    "Yadro"
     CONTACT-INFO
         "Primary Contact: SNMP support team
          email:     snmp@yadro.com"
+    DESCRIPTION
+        "Added YADRO products OIDs"
+    REVISION        "202106170000Z"
     DESCRIPTION
         "Added node for products manufactored by YADRO LLC"
     REVISION        "201909260000Z"
@@ -50,6 +53,10 @@ yadroProducts           OBJECT IDENTIFIER ::= { yadro 3 }
 -- yadroInventoryTable takes { yadro 4 }
 -- yadroSoftwareTable takes { yadro 5 }
 
+-- OIDs for SNMPv2-MIB::sysObjectID field
+vesninBmc               OBJECT IDENTIFIER ::= { yadroProducts 1 }
+vegmanBmc               OBJECT IDENTIFIER ::= { yadroProducts 20 }
+tatlinArchiveSBmc       OBJECT IDENTIFIER ::= { yadroProducts 21 }
 
 --
 
