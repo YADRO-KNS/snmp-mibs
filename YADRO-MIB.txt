@@ -11,11 +11,14 @@ IMPORTS
 ;
 
 yadro MODULE-IDENTITY
-    LAST-UPDATED    "202106170000Z"
+    LAST-UPDATED    "202110010000Z"
     ORGANIZATION    "Yadro"
     CONTACT-INFO
         "Primary Contact: SNMP support team
          email:     snmp@yadro.com"
+    DESCRIPTION
+        "Made table indexes read-only fields"
+    REVISION        "202110010000Z"
     DESCRIPTION
         "Added YADRO products OIDs"
     REVISION        "202106170000Z"
@@ -144,10 +147,7 @@ YADROTempSensorsEntry ::= SEQUENCE {
 
 yadroTempSensorName OBJECT-TYPE
     SYNTAX      OCTET STRING (SIZE(1..32))
-    MAX-ACCESS  not-accessible
-        -- smilint show warning if it have other access level
-        -- If set read-only it will be shown in snmptable output,
-        -- but with undefined '?' values.
+    MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "The name of the temperature sensor."
@@ -237,10 +237,7 @@ YADROVoltSensorsEntry ::= SEQUENCE {
 
 yadroVoltSensorName OBJECT-TYPE
     SYNTAX      OCTET STRING (SIZE(1..32))
-    MAX-ACCESS  not-accessible
-        -- smilint show warning if it have other access level
-        -- If set read-only it will be shown in snmptable output,
-        -- but with undefined '?' values.
+    MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "The name of the voltage sensor."
@@ -330,10 +327,7 @@ YADROTachSensorsEntry ::= SEQUENCE {
 
 yadroTachSensorName OBJECT-TYPE
     SYNTAX      OCTET STRING (SIZE(1..32))
-    MAX-ACCESS  not-accessible
-        -- smilint show warning if it have other access level
-        -- If set read-only it will be shown in snmptable output,
-        -- but with undefined '?' values.
+    MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "The name of the tachometer sensor."
@@ -423,10 +417,7 @@ YADROCurrSensorsEntry ::= SEQUENCE {
 
 yadroCurrSensorName OBJECT-TYPE
     SYNTAX      OCTET STRING (SIZE(1..32))
-    MAX-ACCESS  not-accessible
-        -- smilint show warning if it have other access level
-        -- If set read-only it will be shown in snmptable output,
-        -- but with undefined '?' values.
+    MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "The name of the current sensor."
@@ -516,10 +507,7 @@ YADROPowerSensorsEntry ::= SEQUENCE {
 
 yadroPowerSensorName OBJECT-TYPE
     SYNTAX      OCTET STRING (SIZE(1..32))
-    MAX-ACCESS  not-accessible
-        -- smilint show warning if it have other access level
-        -- If set read-only it will be shown in snmptable output,
-        -- but with undefined '?' values.
+    MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "The name of the power sensor."
@@ -606,7 +594,7 @@ YADROSoftwareEntry ::= SEQUENCE {
 
 yadroSoftwareHash OBJECT-TYPE
     SYNTAX      OCTET STRING (SIZE(1..8))
-    MAX-ACCESS  not-accessible
+    MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "The software hash represent as string."
@@ -679,7 +667,7 @@ YADROInventoryEntry ::= SEQUENCE {
 
 yadroInventoryPath OBJECT-TYPE
     SYNTAX      OCTET STRING(SIZE(1..117))
-    MAX-ACCESS  not-accessible
+    MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "The DBus path of the inventory item based on inventory folder."
@@ -851,7 +839,8 @@ yadroScalarFieldsGroup OBJECT-GROUP
     ::= { yadroGroups 1 }
 
 yadroTempSensorsTableGroup OBJECT-GROUP
-    OBJECTS     { yadroTempSensorValue,
+    OBJECTS     { yadroTempSensorName,
+                  yadroTempSensorValue,
                   yadroTempSensorWarnLow,
                   yadroTempSensorWarnHigh,
                   yadroTempSensorCritLow,
@@ -865,7 +854,8 @@ yadroTempSensorsTableGroup OBJECT-GROUP
     ::= { yadroGroups 2 }
 
 yadroVoltSensorsTableGroup OBJECT-GROUP
-    OBJECTS     { yadroVoltSensorValue,
+    OBJECTS     { yadroVoltSensorName,
+                  yadroVoltSensorValue,
                   yadroVoltSensorWarnLow,
                   yadroVoltSensorWarnHigh,
                   yadroVoltSensorCritLow,
@@ -879,7 +869,8 @@ yadroVoltSensorsTableGroup OBJECT-GROUP
     ::= { yadroGroups 3 }
 
 yadroTachSensorsTableGroup OBJECT-GROUP
-    OBJECTS     { yadroTachSensorValue,
+    OBJECTS     { yadroTachSensorName,
+                  yadroTachSensorValue,
                   yadroTachSensorWarnLow,
                   yadroTachSensorWarnHigh,
                   yadroTachSensorCritLow,
@@ -893,7 +884,8 @@ yadroTachSensorsTableGroup OBJECT-GROUP
     ::= { yadroGroups 4 }
 
 yadroCurrSensorsTableGroup OBJECT-GROUP
-    OBJECTS     { yadroCurrSensorValue,
+    OBJECTS     { yadroCurrSensorName,
+                  yadroCurrSensorValue,
                   yadroCurrSensorWarnLow,
                   yadroCurrSensorWarnHigh,
                   yadroCurrSensorCritLow,
@@ -907,7 +899,8 @@ yadroCurrSensorsTableGroup OBJECT-GROUP
     ::= { yadroGroups 5 }
 
 yadroPowerSensorsTableGroup OBJECT-GROUP
-    OBJECTS     { yadroPowerSensorValue,
+    OBJECTS     { yadroPowerSensorName,
+                  yadroPowerSensorValue,
                   yadroPowerSensorWarnLow,
                   yadroPowerSensorWarnHigh,
                   yadroPowerSensorCritLow,
@@ -921,7 +914,8 @@ yadroPowerSensorsTableGroup OBJECT-GROUP
     ::= { yadroGroups 6 }
 
 yadroSoftwareTableGroup OBJECT-GROUP
-    OBJECTS     { yadroSoftwareVersion,
+    OBJECTS     { yadroSoftwareHash,
+                  yadroSoftwareVersion,
                   yadroSoftwarePurpose,
                   yadroSoftwareActivation,
                   yadroSoftwarePriority
@@ -933,7 +927,8 @@ yadroSoftwareTableGroup OBJECT-GROUP
     ::= { yadroGroups 7 }
 
 yadroInventoryTableGroup OBJECT-GROUP
-    OBJECTS     { yadroInventoryName,
+    OBJECTS     { yadroInventoryPath,
+                  yadroInventoryName,
                   yadroInventoryManufacturer,
                   yadroInventoryBuildDate,
                   yadroInventoryPartNumber,
